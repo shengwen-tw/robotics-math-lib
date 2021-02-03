@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include "robotics_math.h"
@@ -84,7 +85,7 @@ void matrix_transpose(matrix_t *mat, matrix_t *mat_transposed)
 	}
 }
 
-int matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
+bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 {
 	ASSERT(mat->row == mat->column);
 	ASSERT(mat->row == mat_inv->row);
@@ -98,6 +99,7 @@ int matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	 *================================================*/
 	uint32_t r, c;	
 	uint32_t upper_num, lower_num;
+	float *data_ptr;
 	float *inv_data_ptr = mat_inv->data;
 
 	uint32_t last_of_curr_row;
@@ -118,5 +120,37 @@ int matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			*inv_data_ptr++ = 0; //set value and move to next
 			lower_num--;
 		}
+	}
+
+	/*=====================*
+	 * Gauss-Jordan method *
+	 *=====================*/
+	data_ptr = mat->data + (c * column_num);
+	float max_val;
+
+	for(c = 0; c < mat->column; c++) {
+		/* for a fix column, find the largest value of all rows, and let
+		 * it become the pivot element by putting it on the diagonal */
+		for(r = 0; r < mat->row; r++) {
+		        if(*data_ptr > 0) {
+		                if(*data_ptr > max_val) {
+		                        max_val = *data_ptr;
+	        	        }
+		        } else {
+		                if(-*data_ptr > max_val) {
+		                        max_val = *data_ptr;
+		                }
+		        }
+
+			//move the data pointer to next row
+			data_ptr += column_num;
+		}
+
+		/* pivot not found, the matrix is singular */
+		if(max_val == 0.0f) {
+			return false; //singular matrix
+		}
+
+		/* swapping rows to place pivot on the diagonal */
 	}
 }

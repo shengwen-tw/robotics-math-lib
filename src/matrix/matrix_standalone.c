@@ -97,7 +97,8 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	/*================================================*
 	 * initialize return matrix "mat_inv" to identity *
 	 *================================================*/
-	uint32_t r, c;	
+	uint32_t r, c;
+	uint32_t i;
 	uint32_t upper_num, lower_num;
 	float *data_ptr;
 	float *inv_data_ptr = mat_inv->data;
@@ -125,20 +126,23 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	/*=====================*
 	 * Gauss-Jordan method *
 	 *=====================*/
-	data_ptr = mat->data + (c * column_num);
-	float max_val;
+	data_ptr = mat->data;
+	float max_val = 0;
+	uint32_t max_row_pos;
 
 	for(c = 0; c < mat->column; c++) {
-		/* for a fix column, find the largest value of all rows, and let
+		/* for a fixed column, find the largest value of all rows, and let
 		 * it become the pivot element by putting it on the diagonal */
 		for(r = 0; r < mat->row; r++) {
 		        if(*data_ptr > 0) {
 		                if(*data_ptr > max_val) {
 		                        max_val = *data_ptr;
+					max_row_pos = r;
 	        	        }
 		        } else {
 		                if(-*data_ptr > max_val) {
 		                        max_val = *data_ptr;
+					max_row_pos = r;
 		                }
 		        }
 
@@ -151,6 +155,35 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			return false; //singular matrix
 		}
 
-		/* swapping rows to place pivot on the diagonal */
+		/* significant value is not on the diagonal */
+		if(c != max_row_pos) {
+			/* row swapping */
+			float *left_old = &mat->data[c * column_num];
+			float *left_swap = &mat->data[max_row_pos * column_num];
+			float *right_old = &mat_inv->data[c * column_num];
+			float *right_swap = &mat_inv->data[max_row_pos * column_num]; 
+
+			float tmp;
+			for(i = 0; i < column_num; i++) {
+				//swap original matrix
+				tmp = *left_old;
+				*left_old = *left_swap;
+				*left_swap = tmp;
+
+				//swap augmented matrix
+				tmp = *right_old;
+				*right_old = *right_swap;
+				*right_swap = tmp;
+
+				left_old++;
+				left_swap++;
+				right_old++;
+				right_swap++;
+			}
+		}
+
+		/*==========================*
+		 * Gauss-Jordan elimination *
+		 *==========================*/
 	}
 }

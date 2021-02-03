@@ -57,6 +57,19 @@ void matrix_multiply(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 	}
 }
 
+void matrix_scaling(double scaler, matrix_t *mat, matrix_t *mat_scaled)
+{
+	ASSERT(mat->row == mat_scaled->row);
+	ASSERT(mat->column == mat_scaled->column);
+
+	int r, c;
+	for(r = 0; r < mat->row; r++) {
+		for(c = 0; c < mat->column; c++) {
+			matrix_at(mat_scaled, r, c) = scaler * matrix_at(mat, r, c);
+		}
+	}
+}
+
 void matrix_transpose(matrix_t *mat, matrix_t *mat_transposed)
 {
 	ASSERT(mat->row == mat_transposed->column);

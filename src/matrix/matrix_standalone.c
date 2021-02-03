@@ -1,3 +1,4 @@
+#include <string.h>
 #include "robotics_math.h"
 #include "matrix.h"
 
@@ -6,6 +7,7 @@ void matrix_init(matrix_t *mat, float *mat_data, int r, int c)
 	mat->data = mat_data;
 	mat->row = r;
 	mat->column = c;
+	memset(mat, 0, sizeof(float) * r * c);
 }
 
 void matrix_add(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
@@ -42,6 +44,17 @@ void matrix_multiply(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 {
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat2->column);
+
+	/* cache awared naive multiplication */
+	int i, j, k;
+	for(i = 0; i < mat1->row; i++) {
+		for(k = 0; k < mat1->column; k++) {
+			for(j = 0; j < mat2->column; j++) {
+				matrix_at(mat_result, i, j) += 
+					matrix_at(mat1, i, k) * matrix_at(mat2, k, j);
+			}
+		}
+	}
 }
 
 void matrix_transpose(matrix_t *mat, matrix_t *mat_transposed)

@@ -98,7 +98,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	 * initialize return matrix "mat_inv" to identity *
 	 *================================================*/
 	uint32_t r, c;
-	uint32_t i;
+	uint32_t i, j;
 	uint32_t upper_num, lower_num;
 	float *data_ptr;
 	float *inv_data_ptr = mat_inv->data;
@@ -185,5 +185,27 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		/*==========================*
 		 * Gauss-Jordan elimination *
 		 *==========================*/
+		
+		/* divide pivot row by pivot value */
+		float pivot_value = *data_ptr;
+		for(i = 0; i < column_num; i++) {
+			*data_ptr++ /= pivot_value;
+			*inv_data_ptr ++ /= pivot_value;
+		}
+
+		/* perform row opertation */
+		float *left_eliminate_row;
+		float *right_eliminate_row;
+		for(i = 0; i < row_num; i++) {
+			if(i == c) {
+				continue;
+			}
+
+			float row_operation_scaler;
+			for(j = 0; j < column_num; j++) {
+				*left_eliminate_row++ -= row_operation_scaler * data_ptr[j];
+				*right_eliminate_row++ -= row_operation_scaler * inv_data_ptr[j];
+			}
+		}
 	}
 }

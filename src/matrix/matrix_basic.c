@@ -253,26 +253,28 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				right_swap++;
 			}
 		}
-#if 0
+#if 1
 		/* divide pivot row by pivot value */
-		data_ptr = &mat->data[c * column_num + c];
-		inv_data_ptr = &mat_inv->data[c * column_num + c];
-		float pivot_value = *data_ptr;
+		data_ptr = &mat->data[c * column_num /*+ c*/];
+		inv_data_ptr = &mat_inv->data[c * column_num /*+ c*/];
+		float pivot_value = max_val;
 		for(i = 0; i < column_num; i++) {
 			*data_ptr++ /= pivot_value;
 			*inv_data_ptr ++ /= pivot_value;
 		}
+#endif
 
+#if 0
 		/* perform row elimination */
-		float *left_eliminate_row = &mat->data[(max_row_pos * column_num) + c];
-		float *right_eliminate_row = &mat_inv->data[(max_row_pos * column_num) + c];
+		float *left_eliminate_row = &mat->data[(max_row_pos * column_num) /*+ c*/];
+		float *right_eliminate_row = &mat_inv->data[(max_row_pos * column_num) /*+ c*/];
 		for(i = 0; i < row_num; i++) {
 			if(i == c) {
 				continue;
 			}
 
 			float row_operation_scaler = *left_eliminate_row;
-			for(j = c; j < column_num; j++) {
+			for(j = 0/*c*/; j < column_num; j++) {
 				/* row elimination */
 				*left_eliminate_row -= row_operation_scaler * data_ptr[j];
 				*right_eliminate_row -= row_operation_scaler * inv_data_ptr[j];

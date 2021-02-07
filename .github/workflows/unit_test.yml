@@ -1,0 +1,26 @@
+name: unit testing
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+ 
+    steps:      
+    - name: Install Python3 dependencies
+      run: |
+          pip3 install setuptools
+          pip3 install numpy
+          pip3 install pybind11
+          pip3 install progressbar
+           
+    - name: Run unit test of matrix library
+      run: |
+          git clone https://github.com/shengwen-tw/robotics-math-lib.git 
+          cd robotics-math-lib
+          make unit_test_matrix

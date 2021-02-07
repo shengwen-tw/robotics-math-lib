@@ -184,7 +184,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		*inv_data_ptr++ = 1;
 
 		/* initialize upper triangle to 0 */
-		upper_num = row_num - r - 1; //minus 1 is for diagonal
+		upper_num = row_num - r - 1; //minus 1 is for the diagonal
 		while(upper_num > 0) {
 			*inv_data_ptr++ = 0;
 			upper_num--;
@@ -194,14 +194,13 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	/*=====================*
 	 * Gauss-Jordan method *
 	 *=====================*/
-	data_ptr = mat->data;
 	float max_val = 0;
 	uint32_t max_row_pos;
 
 	for(c = 0; c < mat->column; c++) {
 		/* select the element with largest absolute value as pivot and
 		 * put it on the diagonal */
-		data_ptr = &mat->data[c];
+		data_ptr = mat->data + c;
 		for(r = 0; r < mat->row; r++) {
 		        if(*data_ptr >= 0) {
 		                if(*data_ptr > max_val) {
@@ -229,38 +228,48 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		/* significant value is not on the diagonal */
 		if(c != max_row_pos) {
 			/* row swapping */
-			float *left_old = &mat->data[c * column_num /*+ c*/];
-			float *left_swap = &mat->data[max_row_pos * column_num /*+ c*/];
-			float *right_old = &mat_inv->data[c * column_num /*+ c*/];
-			float *right_swap = &mat_inv->data[max_row_pos * column_num /*+ c*/]; 
+			float *left_old = &mat->data[c * column_num + c];
+			float *left_swap = &mat->data[max_row_pos * column_num + c];
+			float *right_old = &mat_inv->data[c * column_num];
+			float *right_swap = &mat_inv->data[max_row_pos * column_num]; 
 
 			float tmp;
-			for(i = 0/*c*/; i < column_num; i++) {
+			for(i = c; i < column_num; i++) {
 				//swap original matrix
 				tmp = *left_old;
 				*left_old = *left_swap;
 				*left_swap = tmp;
 
+				/* next element */
+				left_old++;
+				left_swap++;
+			}
+
+			for(i = 0; i < column_num; i++) {
 				//swap augmented matrix
 				tmp = *right_old;
 				*right_old = *right_swap;
 				*right_swap = tmp;
 
 				/* next element */
-				left_old++;
-				left_swap++;
 				right_old++;
 				right_swap++;
 			}
 		}
 
 		/* divide pivot row by pivot value */
-		data_ptr = &mat->data[c * column_num /*+ c*/];
-		inv_data_ptr = &mat_inv->data[c * column_num /*+ c*/];
+		data_ptr = &mat->data[c * column_num + c];
+
 		float pivot_value = max_val;
+
+		inv_data_ptr = &mat_inv->data[c * column_num];
+
+		for(i = c; i < column_num; i++) {
+			(*data_ptr++) /= pivot_value;
+		}
+
 		for(i = 0; i < column_num; i++) {
-			*data_ptr++ /= pivot_value;
-			*inv_data_ptr ++ /= pivot_value;
+			(*inv_data_ptr++) /= pivot_value;
 		}
 
 		/* perform row elimination */
@@ -269,23 +278,23 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				continue;
 			}
 
-			float *left_eliminate_row = &mat->data[i * column_num /*+ c*/];
-			float *right_eliminate_row = &mat_inv->data[(i * column_num) /*+ c*/];
-			data_ptr = &mat->data[c * column_num];
+			float *left_eliminate_row = &mat->data[i * column_num + c];
+			data_ptr = &mat->data[c * column_num + c];
+
+			float row_operation_scaler = *left_eliminate_row;
+
+			float *right_eliminate_row = &mat_inv->data[i * column_num];
 			inv_data_ptr = &mat_inv->data[c * column_num];
 
-			float row_operation_scaler = *(left_eliminate_row + c);
-
-			for(j = 0/*c*/; j < column_num; j++) {
+			/* row elimination of the original matrix */
+			for(j = c; j < column_num; j++) {
 				/* row elimination */
-				*left_eliminate_row -= row_operation_scaler * *data_ptr;
-				*right_eliminate_row -= row_operation_scaler * *inv_data_ptr;
+				(*left_eliminate_row++) -= row_operation_scaler * (*data_ptr++);
+			}
 
-				/* next element */
-				left_eliminate_row++;
-				right_eliminate_row++;
-				data_ptr++;
-				inv_data_ptr++;
+			/* row elimination of the augmented matrix */
+			for(j = 0; j < column_num; j++) {
+				(*right_eliminate_row++) -= row_operation_scaler * (*inv_data_ptr++);
 			}
 		}
 	}

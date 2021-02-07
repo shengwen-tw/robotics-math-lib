@@ -201,8 +201,9 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	for(c = 0; c < mat->column; c++) {
 		/* select the element with largest absolute value as pivot and
 		 * put it on the diagonal */
+		data_ptr = &mat->data[c];
 		for(r = 0; r < mat->row; r++) {
-		        if(*data_ptr > 0) {
+		        if(*data_ptr >= 0) {
 		                if(*data_ptr > max_val) {
 		                        max_val = *data_ptr;
 					max_row_pos = r;
@@ -218,6 +219,8 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			data_ptr += column_num;
 		}
 
+		printf("pivot of column %d is %f\n", c, max_val);
+
 		/* pivot not found (the whole column is zero), the matrix is singular */
 		if(max_val == 0.0f) {
 			return false; //singular matrix
@@ -226,13 +229,13 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		/* significant value is not on the diagonal */
 		if(c != max_row_pos) {
 			/* row swapping */
-			float *left_old = &mat->data[c * column_num + c];
-			float *left_swap = &mat->data[max_row_pos * column_num + c];
-			float *right_old = &mat_inv->data[c * column_num + c];
-			float *right_swap = &mat_inv->data[max_row_pos * column_num + c]; 
+			float *left_old = &mat->data[c * column_num /*+ c*/];
+			float *left_swap = &mat->data[max_row_pos * column_num /*+ c*/];
+			float *right_old = &mat_inv->data[c * column_num /*+ c*/];
+			float *right_swap = &mat_inv->data[max_row_pos * column_num /*+ c*/]; 
 
 			float tmp;
-			for(i = c; i < column_num; i++) {
+			for(i = 0/*c*/; i < column_num; i++) {
 				//swap original matrix
 				tmp = *left_old;
 				*left_old = *left_swap;
@@ -250,7 +253,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				right_swap++;
 			}
 		}
-
+#if 0
 		/* divide pivot row by pivot value */
 		data_ptr = &mat->data[c * column_num + c];
 		inv_data_ptr = &mat_inv->data[c * column_num + c];
@@ -281,5 +284,6 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				inv_data_ptr++;
 			}
 		}
+#endif
 	}
 }

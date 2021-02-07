@@ -1,8 +1,10 @@
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include "robotics_math.h"
 #include "matrix.h"
+#include "math.h"
 
 void matrix_init(matrix_t *mat, int r, int c, float *mat_data)
 {
@@ -194,21 +196,24 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	/*=====================*
 	 * Gauss-Jordan method *
 	 *=====================*/
-	float max_val = 0;
+	float max_val;
 	uint32_t max_row_pos;
 
 	for(c = 0; c < mat->column; c++) {
+		max_val = 0;
+		max_row_pos = 0;
+
 		/* select the element with largest absolute value as pivot and
 		 * put it on the diagonal */
-		data_ptr = mat->data + c;
-		for(r = 0; r < mat->row; r++) {
+		data_ptr = &mat->data[(c * column_num) + c];
+		for(r = c; r < mat->row; r++) {
 		        if(*data_ptr >= 0) {
-		                if(*data_ptr > max_val) {
+		                if(*data_ptr > fabs(max_val)) {
 		                        max_val = *data_ptr;
 					max_row_pos = r;
 	        	        }
 		        } else {
-		                if(-*data_ptr > max_val) {
+		                if(-*data_ptr > fabs(max_val)) {
 		                        max_val = *data_ptr;
 					max_row_pos = r;
 		                }

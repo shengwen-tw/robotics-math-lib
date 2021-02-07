@@ -12,10 +12,58 @@ void matrix_init(matrix_t *mat, float *mat_data, int r, int c)
 	memset(mat, 0, sizeof(float) * r * c);
 }
 
+void matrix_zeros(matrix_t *mat)
+{
+	ASSERT(mat->data != NULL);
+
+	memset(mat, 0, sizeof(float) * mat->row * mat->column);
+}
+
+void matrix_set_identity(matrix_t *mat)
+{
+	ASSERT(mat->data != NULL);
+	ASSERT(mat->row == mat->column);
+
+	uint32_t row_num    = mat->row;
+	uint32_t column_num = mat->column;
+
+	uint32_t upper_num, lower_num;
+
+	float *data_ptr = mat->data;
+
+	int r, c;
+	for(r = 0; r < mat->row; r++) {
+		/* initialize lower triangle */
+		upper_num = row_num - r;
+		while(upper_num > 0) {
+			*data_ptr = 0; //set value and move to next
+			data_ptr++;
+			upper_num--;	
+		}
+
+		/* initialize diagonal */
+		*data_ptr = 1; //set value 1 and move to next
+		data_ptr++;
+
+		/* initialize upper triangle */
+		lower_num = r - 1;
+		while(lower_num > 0) {
+			*data_ptr = 0; //set value and move to next
+			data_ptr++;
+			lower_num--;
+		}
+	}
+}
+
 void matrix_add(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 {
+	ASSERT(mat1->data != NULL);
+	ASSERT(mat2->data != NULL);
+	ASSERT(mat_result->data != NULL);
+
 	ASSERT(mat1->row == mat2->row);
 	ASSERT(mat1->column == mat2->column);
+
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat1->column);
 
@@ -29,8 +77,13 @@ void matrix_add(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 
 void matrix_sub(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 {
+	ASSERT(mat1->data != NULL);
+	ASSERT(mat2->data != NULL);
+	ASSERT(mat_result->data != NULL);
+
 	ASSERT(mat1->row == mat2->row);
 	ASSERT(mat1->column == mat2->column);
+
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat1->column);
 
@@ -44,6 +97,10 @@ void matrix_sub(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 
 void matrix_multiply(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 {
+	ASSERT(mat1->data != NULL);
+	ASSERT(mat2->data != NULL);
+	ASSERT(mat_result->data != NULL);
+
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat2->column);
 
@@ -61,6 +118,9 @@ void matrix_multiply(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 
 void matrix_scaling(double scaler, matrix_t *mat, matrix_t *mat_scaled)
 {
+	ASSERT(mat->data != NULL);
+	ASSERT(mat_scaled->data != NULL);
+
 	ASSERT(mat->row == mat_scaled->row);
 	ASSERT(mat->column == mat_scaled->column);
 
@@ -74,6 +134,9 @@ void matrix_scaling(double scaler, matrix_t *mat, matrix_t *mat_scaled)
 
 void matrix_transpose(matrix_t *mat, matrix_t *mat_transposed)
 {
+	ASSERT(mat->data != NULL);
+	ASSERT(mat_transposed->data != NULL);
+
 	ASSERT(mat->row == mat_transposed->column);
 	ASSERT(mat->column == mat_transposed->row);
 
@@ -87,6 +150,9 @@ void matrix_transpose(matrix_t *mat, matrix_t *mat_transposed)
 
 bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 {
+	ASSERT(mat->data != NULL);
+	ASSERT(mat_inv->data != NULL);
+
 	ASSERT(mat->row == mat->column);
 	ASSERT(mat->row == mat_inv->row);
 	ASSERT(mat->column == mat_inv->column);

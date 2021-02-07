@@ -69,11 +69,13 @@ void matrix_add(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat1->column);
 
-	int r, c;
-	for(r = 0; r < mat1->row; r++) {
-		for(c = 0; c < mat1->column; c++) {
-			matrix_at(mat_result, r, c) = matrix_at(mat1, r, c) + matrix_at(mat2, r, c);
-		}
+	float *mat1_ptr = mat1->data;
+	float *mat2_ptr = mat2->data;
+	float *mat_result_ptr = mat_result->data; 
+
+	uint32_t cnt = mat_result->row * mat_result->column;
+	while(cnt--) {
+		(*mat_result_ptr++) = (*mat1_ptr++) + (*mat2_ptr++);
 	}
 }
 
@@ -89,11 +91,13 @@ void matrix_sub(matrix_t *mat1, matrix_t *mat2, matrix_t *mat_result)
 	ASSERT(mat_result->row == mat1->row);
 	ASSERT(mat_result->column == mat1->column);
 
-	int r, c;
-	for(r = 0; r < mat1->row; r++) {
-		for(c = 0; c < mat1->column; c++) {
-			matrix_at(mat_result, r, c) = matrix_at(mat1, r, c) - matrix_at(mat2, r, c);
-		}
+	float *mat1_ptr = mat1->data;
+	float *mat2_ptr = mat2->data;
+	float *mat_result_ptr = mat_result->data; 
+
+	uint32_t cnt = mat_result->row * mat_result->column;
+	while(cnt--) {
+		(*mat_result_ptr++) = (*mat1_ptr++) - (*mat2_ptr++);
 	}
 }
 

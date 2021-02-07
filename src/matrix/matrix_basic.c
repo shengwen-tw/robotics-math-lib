@@ -31,30 +31,27 @@ void matrix_set_identity(matrix_t *mat)
 	uint32_t row_num    = mat->row;
 	uint32_t column_num = mat->column;
 
-	uint32_t upper_num, lower_num;
+	int32_t upper_num, lower_num;
 
 	float *data_ptr = mat->data;
 
 	int r, c;
 	for(r = 0; r < mat->row; r++) {
-		/* initialize lower triangle */
-		upper_num = row_num - r;
-		while(upper_num > 0) {
-			*data_ptr = 0; //set value and move to next
-			data_ptr++;
-			upper_num--;	
+		/* initialize lower triangle to 0 */
+		lower_num = r;
+		while(lower_num > 0) {
+			*data_ptr++ = 0;
+			lower_num--;
 		}
 
-		/* initialize diagonal */
-		*data_ptr = 1; //set value 1 and move to next
-		data_ptr++;
+		/* initialize diagonal to 1*/
+		*data_ptr++ = 1;
 
-		/* initialize upper triangle */
-		lower_num = r - 1;
-		while(lower_num > 0) {
-			*data_ptr = 0; //set value and move to next
-			data_ptr++;
-			lower_num--;
+		/* initialize upper triangle to 0 */
+		upper_num = row_num - r - 1; //minus 1 is for diagonal
+		while(upper_num > 0) {
+			*data_ptr++ = 0;
+			upper_num--;
 		}
 	}
 }
@@ -173,26 +170,22 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	float *data_ptr;
 	float *inv_data_ptr = mat_inv->data;
 
-	uint32_t last_of_curr_row;
 	for(r = 0; r < mat_inv->row; r++) {
-		/* initialize lower triangle */
-		upper_num = row_num - r;
-		while(upper_num > 0) {
-			*inv_data_ptr = 0; //set value and move to next
-			inv_data_ptr++;
-			upper_num--;	
+		/* initialize lower triangle to 0 */
+		lower_num = r;
+		while(lower_num > 0) {
+			*inv_data_ptr++ = 0;
+			lower_num--;
 		}
 
-		/* initialize diagonal */
-		*inv_data_ptr = 1; //set value 1 and move to next
-		inv_data_ptr++;
+		/* initialize diagonal to 1*/
+		*inv_data_ptr++ = 1;
 
-		/* initialize upper triangle */
-		lower_num = r - 1;
-		while(lower_num > 0) {
-			*inv_data_ptr = 0; //set value and move to next
-			inv_data_ptr++;
-			lower_num--;
+		/* initialize upper triangle to 0 */
+		upper_num = row_num - r - 1; //minus 1 is for diagonal
+		while(upper_num > 0) {
+			*inv_data_ptr++ = 0;
+			upper_num--;
 		}
 	}
 
@@ -256,10 +249,6 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			}
 		}
 
-		/*==========================*
-		 * Gauss-Jordan elimination *
-		 *==========================*/
-		
 		/* divide pivot row by pivot value */
 		data_ptr = &mat->data[c * column_num + c];
 		inv_data_ptr = &mat_inv->data[c * column_num + c];

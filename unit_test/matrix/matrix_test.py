@@ -126,8 +126,8 @@ def matrix_compare(mat1, mat2):
         for j in range(mat1.shape[1]):
             error_percentage = abs(mat1[i][j] - mat2[i][j]) / abs(mat1[i][j])
 
-        #tolerate 5% of error
-        if error_percentage > 0.05:
+        #tolerate 10% of error
+        if error_percentage > 0.1:
             return False
 
     return True

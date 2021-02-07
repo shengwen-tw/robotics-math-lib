@@ -3,4 +3,7 @@
 
 #define ASSERT(EXPR) while(EXPR != 1)
 
+#include "matrix.h"
+#include "matrix_util.h"
+
 #endif

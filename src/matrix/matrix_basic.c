@@ -4,19 +4,23 @@
 #include "robotics_math.h"
 #include "matrix.h"
 
-void matrix_init(matrix_t *mat, float *mat_data, int r, int c)
+void matrix_init(matrix_t *mat, int r, int c, float *mat_data)
 {
 	mat->data = mat_data;
 	mat->row = r;
 	mat->column = c;
-	memset(mat, 0, sizeof(float) * r * c);
 }
 
-void matrix_zeros(matrix_t *mat)
+void matrix_set_zeros(matrix_t *mat)
 {
 	ASSERT(mat->data != NULL);
 
-	memset(mat, 0, sizeof(float) * mat->row * mat->column);
+	uint32_t cnt = mat->row * mat->column;
+	float *curr_element = mat->data;
+
+	while(cnt--) {
+		*curr_element++ = 0;
+	}
 }
 
 void matrix_set_identity(matrix_t *mat)

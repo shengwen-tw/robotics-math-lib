@@ -2,7 +2,7 @@ CC=gcc
 
 CFLAGS=-g -O2
 
-SRC=./src/matrix/matrix_standalone.c
+SRC=./src/matrix/matrix_basic.c
 
 CFLAGS+=-I./include/
 

@@ -31,13 +31,12 @@ void matrix_set_identity(matrix_t *mat)
 	ASSERT(mat->row == mat->column);
 
 	uint32_t row_num    = mat->row;
-	uint32_t column_num = mat->column;
 
 	int32_t upper_num, lower_num;
 
 	float *data_ptr = mat->data;
 
-	int r, c;
+	int r;
 	for(r = 0; r < mat->row; r++) {
 		/* initialize lower triangle to 0 */
 		lower_num = r;
@@ -162,15 +161,15 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	ASSERT(mat->row == mat_inv->row);
 	ASSERT(mat->column == mat_inv->column);
 
-	uint32_t row_num    = mat->row;
-	uint32_t column_num = mat->column;
+	int32_t row_num    = mat->row;
+	int32_t column_num = mat->column;
 
 	/*================================================*
 	 * initialize return matrix "mat_inv" to identity *
 	 *================================================*/
-	uint32_t r, c;
-	uint32_t i, j;
-	uint32_t upper_num, lower_num;
+	int32_t r, c;
+	int32_t i, j;
+	int32_t upper_num, lower_num;
 	float *data_ptr;
 	float *inv_data_ptr = mat_inv->data;
 
@@ -197,7 +196,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	 * Gauss-Jordan method *
 	 *=====================*/
 	float max_val;
-	uint32_t max_row_pos;
+	int32_t max_row_pos;
 
 	for(c = 0; c < mat->column; c++) {
 		max_val = 0;
@@ -303,4 +302,6 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			}
 		}
 	}
+
+	return true;
 }

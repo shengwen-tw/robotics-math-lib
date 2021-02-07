@@ -5,7 +5,7 @@ TARGET_LIB = $(TARGET)$(shell python3-config --extension-suffix)
 
 MATRIX_LIB_PATH=../../src/matrix
 
-CXXFLAGS+=-std=c++17 -O3 -g -Wall -Wno-unused-label -shared -fPIC
+CXXFLAGS+=-std=c++17 -O2 -g -Wall -Wno-unused-label -shared -fPIC
 CXXFLAGS+=`python3 -m pybind11 --includes`
 
 CXXFLAGS+=-I../../include

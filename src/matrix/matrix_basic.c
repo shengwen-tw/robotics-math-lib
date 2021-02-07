@@ -219,7 +219,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			data_ptr += column_num;
 		}
 
-		printf("pivot of column %d is %f\n", c, max_val);
+		//printf("pivot of column %d is %f\n", c, max_val);
 
 		/* pivot not found (the whole column is zero), the matrix is singular */
 		if(max_val == 0.0f) {
@@ -253,7 +253,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				right_swap++;
 			}
 		}
-#if 1
+
 		/* divide pivot row by pivot value */
 		data_ptr = &mat->data[c * column_num /*+ c*/];
 		inv_data_ptr = &mat_inv->data[c * column_num /*+ c*/];
@@ -262,22 +262,24 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 			*data_ptr++ /= pivot_value;
 			*inv_data_ptr ++ /= pivot_value;
 		}
-#endif
 
-#if 0
 		/* perform row elimination */
-		float *left_eliminate_row = &mat->data[(max_row_pos * column_num) /*+ c*/];
-		float *right_eliminate_row = &mat_inv->data[(max_row_pos * column_num) /*+ c*/];
 		for(i = 0; i < row_num; i++) {
 			if(i == c) {
 				continue;
 			}
 
-			float row_operation_scaler = *left_eliminate_row;
+			float *left_eliminate_row = &mat->data[i * column_num /*+ c*/];
+			float *right_eliminate_row = &mat_inv->data[(i * column_num) /*+ c*/];
+			data_ptr = &mat->data[c * column_num];
+			inv_data_ptr = &mat_inv->data[c * column_num];
+
+			float row_operation_scaler = *(left_eliminate_row + c);
+
 			for(j = 0/*c*/; j < column_num; j++) {
 				/* row elimination */
-				*left_eliminate_row -= row_operation_scaler * data_ptr[j];
-				*right_eliminate_row -= row_operation_scaler * inv_data_ptr[j];
+				*left_eliminate_row -= row_operation_scaler * *data_ptr;
+				*right_eliminate_row -= row_operation_scaler * *inv_data_ptr;
 
 				/* next element */
 				left_eliminate_row++;
@@ -286,6 +288,5 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				inv_data_ptr++;
 			}
 		}
-#endif
 	}
 }

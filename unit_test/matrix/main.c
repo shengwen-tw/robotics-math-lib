@@ -154,14 +154,15 @@ void matrix_test_inverse(void)
 	matrix_t mat;
 	matrix_init(&mat, 3, 3, mat_data);
 
+	printf("matrix_inverse:\n\r");
+	print_matrix("mat", &mat);
+
 	float mat_result_data[3 * 3];
 	matrix_t mat_result;
 	matrix_init(&mat_result, 3, 3, mat_result_data);
 
 	matrix_inverse(&mat, &mat_result);
 
-	printf("matrix_inverse:\n\r");
-	print_matrix("mat", &mat);
 	print_matrix("mat_result", &mat_result);
 	printf("----------------------------------\n");
 }

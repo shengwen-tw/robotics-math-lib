@@ -126,6 +126,26 @@ void matrix_test_multiply(void)
 	printf("----------------------------------\n");
 }
 
+void matrix_test_scaling(void)
+{
+	float mat_data[] = {1, 2, 3,
+                              4, 5, 6,
+                              7, 8, 9};
+	matrix_t mat;
+	matrix_init(&mat, 3, 3, mat_data);
+
+	float mat_result_data[3 * 3];
+	matrix_t mat_result;
+	matrix_init(&mat_result, 3, 3, mat_result_data);
+
+	matrix_scaling(100, &mat, &mat_result);
+
+	printf("matrix_scaling:\n\r");
+	print_matrix("mat", &mat);
+	print_matrix("mat_result", &mat_result);
+	printf("----------------------------------\n");
+}
+
 int main(void)
 {
 	matrix_test_init();
@@ -134,6 +154,7 @@ int main(void)
 	matrix_test_add();
 	matrix_test_sub();
 	matrix_test_multiply();
+	matrix_test_scaling();
 
 	return 0;
 }

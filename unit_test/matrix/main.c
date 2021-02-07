@@ -146,6 +146,27 @@ void matrix_test_scaling(void)
 	printf("----------------------------------\n");
 }
 
+void matrix_test_inverse(void)
+{
+	float mat_data[] = { 1, 0,  2,
+                            -1, 5,  0,
+                             0, 3, -9};
+	matrix_t mat;
+	matrix_init(&mat, 3, 3, mat_data);
+
+	float mat_result_data[3 * 3];
+	matrix_t mat_result;
+	matrix_init(&mat_result, 3, 3, mat_result_data);
+
+	matrix_inverse(&mat, &mat_result);
+
+	printf("matrix_inverse:\n\r");
+	print_matrix("mat", &mat);
+	print_matrix("mat_result", &mat_result);
+	printf("----------------------------------\n");
+}
+
+
 int main(void)
 {
 	matrix_test_init();
@@ -155,6 +176,7 @@ int main(void)
 	matrix_test_sub();
 	matrix_test_multiply();
 	matrix_test_scaling();
+	matrix_test_inverse();
 
 	return 0;
 }

@@ -1,20 +1,5 @@
-CC=gcc
+unit_test_matrix:
+	@$(MAKE) -C ./unit_test/matrix -f Makefile
+	@python3 ./unit_test/matrix/matrix_test.py
 
-CFLAGS=-g -O2
-
-SRC=./src/matrix/matrix_basic.c
-
-CFLAGS+=-I./include/
-
-OBJS=$(SRC:.c=.o)
-
-build: $(OBJS)
-
-%.o: %.c
-	@echo "CC" $<
-	@$(CC) $(CFLAGS) $^ -c -o $@
-	
-clean:
-	rm -rf $(OBJS)
-
-.PHONY: build clean
+.PHONY: unit_test_matrix

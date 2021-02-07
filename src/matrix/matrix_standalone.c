@@ -108,17 +108,20 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		/* initialize lower triangle */
 		upper_num = row_num - r;
 		while(upper_num > 0) {
-			*inv_data_ptr++ = 0; //set value and move to next
+			*inv_data_ptr = 0; //set value and move to next
+			inv_data_ptr++;
 			upper_num--;	
 		}
 
 		/* initialize diagonal */
-		*inv_data_ptr++ = 1; //set value 1 and move to next
+		*inv_data_ptr = 1; //set value 1 and move to next
+		inv_data_ptr++;
 
 		/* initialize upper triangle */
 		lower_num = r - 1;
 		while(lower_num > 0) {
-			*inv_data_ptr++ = 0; //set value and move to next
+			*inv_data_ptr = 0; //set value and move to next
+			inv_data_ptr++;
 			lower_num--;
 		}
 	}
@@ -131,8 +134,8 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 	uint32_t max_row_pos;
 
 	for(c = 0; c < mat->column; c++) {
-		/* for a fixed column, find the largest value of all rows, and let
-		 * it become the pivot element by putting it on the diagonal */
+		/* select the element with largest absolute value as pivot and
+		 * put it on the diagonal */
 		for(r = 0; r < mat->row; r++) {
 		        if(*data_ptr > 0) {
 		                if(*data_ptr > max_val) {
@@ -146,11 +149,11 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		                }
 		        }
 
-			//move the data pointer to next row
+			//next row
 			data_ptr += column_num;
 		}
 
-		/* pivot not found, the matrix is singular */
+		/* pivot not found (the whole column is zero), the matrix is singular */
 		if(max_val == 0.0f) {
 			return false; //singular matrix
 		}
@@ -158,13 +161,13 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		/* significant value is not on the diagonal */
 		if(c != max_row_pos) {
 			/* row swapping */
-			float *left_old = &mat->data[c * column_num];
-			float *left_swap = &mat->data[max_row_pos * column_num];
-			float *right_old = &mat_inv->data[c * column_num];
-			float *right_swap = &mat_inv->data[max_row_pos * column_num]; 
+			float *left_old = &mat->data[c * column_num + c];
+			float *left_swap = &mat->data[max_row_pos * column_num + c];
+			float *right_old = &mat_inv->data[c * column_num + c];
+			float *right_swap = &mat_inv->data[max_row_pos * column_num + c]; 
 
 			float tmp;
-			for(i = 0; i < column_num; i++) {
+			for(i = c; i < column_num; i++) {
 				//swap original matrix
 				tmp = *left_old;
 				*left_old = *left_swap;
@@ -175,6 +178,7 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 				*right_old = *right_swap;
 				*right_swap = tmp;
 
+				/* next element */
 				left_old++;
 				left_swap++;
 				right_old++;
@@ -187,24 +191,33 @@ bool matrix_inverse(matrix_t *mat, matrix_t *mat_inv)
 		 *==========================*/
 		
 		/* divide pivot row by pivot value */
+		data_ptr = &mat->data[c * column_num + c];
+		inv_data_ptr = &mat_inv->data[c * column_num + c];
 		float pivot_value = *data_ptr;
 		for(i = 0; i < column_num; i++) {
 			*data_ptr++ /= pivot_value;
 			*inv_data_ptr ++ /= pivot_value;
 		}
 
-		/* perform row opertation */
-		float *left_eliminate_row;
-		float *right_eliminate_row;
+		/* perform row elimination */
+		float *left_eliminate_row = &mat->data[(max_row_pos * column_num) + c];
+		float *right_eliminate_row = &mat_inv->data[(max_row_pos * column_num) + c];
 		for(i = 0; i < row_num; i++) {
 			if(i == c) {
 				continue;
 			}
 
-			float row_operation_scaler;
-			for(j = 0; j < column_num; j++) {
-				*left_eliminate_row++ -= row_operation_scaler * data_ptr[j];
-				*right_eliminate_row++ -= row_operation_scaler * inv_data_ptr[j];
+			float row_operation_scaler = *left_eliminate_row;
+			for(j = c; j < column_num; j++) {
+				/* row elimination */
+				*left_eliminate_row -= row_operation_scaler * data_ptr[j];
+				*right_eliminate_row -= row_operation_scaler * inv_data_ptr[j];
+
+				/* next element */
+				left_eliminate_row++;
+				right_eliminate_row++;
+				data_ptr++;
+				inv_data_ptr++;
 			}
 		}
 	}

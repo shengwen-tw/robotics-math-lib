@@ -1,3 +1,5 @@
 *.o
+*.d
+*.so
 *.sw*
 matrix_test
